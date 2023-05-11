@@ -34,7 +34,7 @@ public class Record implements Comparable<Record>{
 		return totalScore;
 	}
 
-	public int compareTo(Record o) {
+	public int compareTo(Record o) {	//check gia null sto total score 
 		float result = this.getCurrentScore() - o.getCurrentScore();
 		if (result > 0) {
 			return 1;

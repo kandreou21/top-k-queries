@@ -8,23 +8,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
-import java.util.Scanner;
 
 public class TopK {
-	private int k;
-	
-	public int inputK() {
-		Scanner input = new Scanner(System.in);
-		System.out.print("Enter the k:");
-		
-		k = input.nextInt();
-		if (k <= 0) {
-			System.out.println("Exiting,k must be a positive integer bigger than 0");
-			System.exit(-1);
-		}
-		input.close();
-		return k;
-	}	
+	int k = 15;
 	
 	public float[] readRndFile() {
 		BufferedReader br;
@@ -67,6 +53,9 @@ public class TopK {
 				} else {
 					recordsFound.get(id).setTotalScore(value1);		
 				}
+				accesses++;
+				threshold = value1 + value2 + 5f;
+				
 				if (minHeap == null) {
 					minHeap = initialiseMinHeap(recordsFound, minHeap);	
 				} else {
@@ -75,13 +64,12 @@ public class TopK {
 						boolean stopFlag = checkTermination(recordsFound, minHeap, value1, value2);
 						if (stopFlag == true) {
 							System.out.println("Number of sequential accesses= " + accesses);
+							System.out.println("line1: " + line1 + "line2" + line2);
 							return minHeap;
 						}
 					}
 				}
-				accesses++;
-				threshold = value1 + value2 + 5f;
-
+				
 				//seq2
 				lineValues = line2.split(" ");
 				id = Integer.parseInt(lineValues[0]);
@@ -93,6 +81,9 @@ public class TopK {
 				} else {
 					recordsFound.get(id).setTotalScore(value2);
 				}
+				accesses++;
+				threshold = value1 + value2 + 5f;	
+				
 				if (minHeap == null) {
 					minHeap = initialiseMinHeap(recordsFound, minHeap);	
 				} else {
@@ -101,12 +92,11 @@ public class TopK {
 						boolean stopFlag = checkTermination(recordsFound, minHeap, value1, value2);
 						if (stopFlag == true) {
 							System.out.println("Number of sequential accesses= " + accesses);
+							System.out.println("line1: " + line1 + "line2" + line2);
 							return minHeap;
 						}
 					}
 				}
-				accesses++;
-				threshold = value1 + value2 + 5f;	
 			}			
 		} catch (IOException e) {}		
 		System.out.println("Number of sequential accesses= " + accesses);		
@@ -133,7 +123,8 @@ public class TopK {
 
 	private void checkPush(HashMap<Integer, Record> recordsFound, PriorityQueue<Record> minHeap, int id) {
 		if (!minHeap.contains(recordsFound.get(id))) {
-			if (minHeap.peek().getCurrentScore() <= recordsFound.get(id).getCurrentScore()) {
+			if (minHeap.peek().getCurrentScore() < recordsFound.get(id).getCurrentScore()) {
+				System.out.println("joined" + id);
 				minHeap.poll();
 				minHeap.add(recordsFound.get(id));
 			}
@@ -147,7 +138,7 @@ public class TopK {
 		return minHeap;
 	}
 	
-	public void checkBruteForce(){ 
+	public FloatWithIndex[] checkBruteForce(){ 
 		float[] R = readRndFile();
 		BufferedReader seq1;
 		BufferedReader seq2;
@@ -172,10 +163,7 @@ public class TopK {
                 return Float.compare(f2.value, f1.value);
             }
         });
-        System.out.println("Brute force all entries sorted");
-        for (int i = 0; i < R.length; i++) {
-            System.out.println(i + " " +arrWithIndex[i].index + ": " + String.format("%.2f", arrWithIndex[i].value));
-        }
+        return arrWithIndex;
 	}
 
 	private void sum(float[] R, String[] lineValues) { 
@@ -195,6 +183,7 @@ public class TopK {
 	}
 	
 	public void printTopKs(PriorityQueue<Record> minHeap) {
+		FloatWithIndex[] bruteForce = checkBruteForce();
 		ArrayList<Record> tops = new ArrayList<Record>();
 		int counter = 0;
 		for (int i = 0; i < k; i++) {
@@ -203,15 +192,15 @@ public class TopK {
 		}
 		Collections.reverse(tops);
 		System.out.println("Top k objects:");	
-		for (Record record : tops) {
-			System.out.println(counter + " " + record.getId() + ": " + String.format("%.2f", record.getCurrentScore()));
+		for (int i = 0; i < k; i++) {
+			System.out.println(counter + " " + tops.get(i).getId() + ": " + String.format("%.2f", tops.get(i).getCurrentScore()) + "	" + bruteForce[i].index + ": " + String.format("%.2f", bruteForce[i].value));
 			counter++;
 		}
 	}
 	
 	public static void main(String[] args) {
 		TopK topK = new TopK();
-		topK.inputK();
+		//topK.k = Integer.parseInt(args[0]);
 		//topK.checkBruteForce();
 		PriorityQueue<Record> minHeap = topK.readSeqFiles();
 		topK.printTopKs(minHeap);
