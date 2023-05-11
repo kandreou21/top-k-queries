@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class TopK {
-	int k = 15;
+	int k = 20;
 	
 	public float[] readRndFile() {
 		BufferedReader br;
@@ -60,11 +60,9 @@ public class TopK {
 					minHeap = initialiseMinHeap(recordsFound, minHeap);	
 				} else {
 					checkPush(recordsFound, minHeap, id);	
-					if (minHeap.peek().getCurrentScore() >= threshold) { //checking for termination
-						boolean stopFlag = checkTermination(recordsFound, minHeap, value1, value2);
-						if (stopFlag == true) {
+					if (minHeap.peek().getCurrentScore() > threshold) { //checking for termination
+						if (checkTermination(recordsFound, minHeap, value1, value2) == true) {
 							System.out.println("Number of sequential accesses= " + accesses);
-							System.out.println("line1: " + line1 + "line2" + line2);
 							return minHeap;
 						}
 					}
@@ -88,11 +86,9 @@ public class TopK {
 					minHeap = initialiseMinHeap(recordsFound, minHeap);	
 				} else {
 					checkPush(recordsFound, minHeap, id);	
-					if (minHeap.peek().getCurrentScore() >= threshold) { //checking for termination
-						boolean stopFlag = checkTermination(recordsFound, minHeap, value1, value2);
-						if (stopFlag == true) {
+					if (minHeap.peek().getCurrentScore() > threshold) { //checking for termination
+						if (checkTermination(recordsFound, minHeap, value1, value2) == true) {
 							System.out.println("Number of sequential accesses= " + accesses);
-							System.out.println("line1: " + line1 + "line2" + line2);
 							return minHeap;
 						}
 					}
@@ -105,9 +101,9 @@ public class TopK {
 
 	private boolean checkTermination(HashMap<Integer, Record> recordsFound, PriorityQueue<Record> minHeap,
 			float value1, float value2) {
+		float upperBound = 0;
 		for (Record record : recordsFound.values()) {
 			if (!minHeap.contains(record)) {
-				float upperBound;
 				if (record.fileShown == 1) {
 					upperBound = record.getLowerBound() + value2;  
 				} else {
@@ -118,13 +114,16 @@ public class TopK {
 				}	
 			} 
 		}
+		System.out.println(upperBound);
 		return true;
 	}
 
 	private void checkPush(HashMap<Integer, Record> recordsFound, PriorityQueue<Record> minHeap, int id) {
 		if (!minHeap.contains(recordsFound.get(id))) {
 			if (minHeap.peek().getCurrentScore() < recordsFound.get(id).getCurrentScore()) {
-				System.out.println("joined" + id);
+				System.out.println("minHeap: " + minHeap);
+				System.out.println("left: " + minHeap.peek().getId() + " with score: " + minHeap.peek().getCurrentScore());
+				System.out.println("joined: " + id + " with score: " + recordsFound.get(id).getCurrentScore());
 				minHeap.poll();
 				minHeap.add(recordsFound.get(id));
 			}

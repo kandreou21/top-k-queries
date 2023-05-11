@@ -29,18 +29,21 @@ public class Record implements Comparable<Record>{
 	}
 	
 	public float getCurrentScore() {
-		if (totalScore == null)
+		if (totalScore == null) {
 			return lowerBound;
+		}
 		return totalScore;
 	}
 
 	public int compareTo(Record o) {	//check gia null sto total score 
 		float result = this.getCurrentScore() - o.getCurrentScore();
+		System.out.println("result: " + result + ", Objects: " + this.id + " score: " + this.getCurrentScore() + " " + o.getId() + " score: " + o.getCurrentScore());
 		if (result > 0) {
 			return 1;
 		} else if (result < 0) {
 			return -1;
 		} else {
+			System.out.println("---------");
 			return o.timestamp.compareTo(timestamp);
 		}	
 	}
