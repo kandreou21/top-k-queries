@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class TopK {
-	int k = 20;
+	int k = 15;
 	
 	public float[] readRndFile() {
 		BufferedReader br;
@@ -60,7 +60,7 @@ public class TopK {
 					minHeap = initialiseMinHeap(recordsFound, minHeap);	
 				} else {
 					checkPush(recordsFound, minHeap, id);	
-					if (minHeap.peek().getCurrentScore() > threshold) { //checking for termination
+					if (minHeap.peek().getCurrentScore() >= threshold) { //checking for termination
 						if (checkTermination(recordsFound, minHeap, value1, value2) == true) {
 							System.out.println("Number of sequential accesses= " + accesses);
 							return minHeap;
@@ -86,7 +86,7 @@ public class TopK {
 					minHeap = initialiseMinHeap(recordsFound, minHeap);	
 				} else {
 					checkPush(recordsFound, minHeap, id);	
-					if (minHeap.peek().getCurrentScore() > threshold) { //checking for termination
+					if (minHeap.peek().getCurrentScore() >= threshold) { //checking for termination
 						if (checkTermination(recordsFound, minHeap, value1, value2) == true) {
 							System.out.println("Number of sequential accesses= " + accesses);
 							return minHeap;
@@ -133,6 +133,7 @@ public class TopK {
 	private PriorityQueue<Record> initialiseMinHeap(HashMap<Integer, Record> recordsFound, PriorityQueue<Record> minHeap) {
 		if (recordsFound.size() == k) {
 			minHeap = new PriorityQueue<Record>(recordsFound.values());
+			System.out.println("Initialised MinHeap: " + minHeap);
 		}
 		return minHeap;
 	}
