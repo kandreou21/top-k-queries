@@ -2,7 +2,7 @@ public class Record implements Comparable<Record>{
 	private int id;
 	private Float lowerBound;
 	private Float totalScore;
-	int fileShown; //1 seq1, 2 seq2
+	int fileShown; //1 for seq1, 2 for seq2
 	Long timestamp = System.nanoTime();
 	 
 	public Record(int id, float lowerBound, int fileShown) {
@@ -35,27 +35,26 @@ public class Record implements Comparable<Record>{
 		return totalScore;
 	}
 
-	public int compareTo(Record o) {	//check gia null sto total score 
+	public int compareTo(Record o) {
 		float result = this.getCurrentScore() - o.getCurrentScore();
-		//System.out.println("result: " + result + ", Objects: " + this.id + " score: " + this.getCurrentScore() + " " + o.getId() + " score: " + o.getCurrentScore());
 		if (result > 0) {
 			return 1;
 		} else if (result < 0) {
 			return -1;
 		} else {
-			//System.out.println("---------");
-			return o.timestamp.compareTo(timestamp);
+			if (this.totalScore == null && o.getTotalScore() != null) {
+				return 1;
+			}
+			else if (this.totalScore != null && o.getTotalScore() == null) {
+				return -1;
+			} else {
+				return o.timestamp.compareTo(timestamp);
+			}
 		}	
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		Record other = (Record) obj;
 		if (id != other.id)
 			return false;
@@ -64,6 +63,6 @@ public class Record implements Comparable<Record>{
 
 	@Override
 	public String toString() {
-		return "Record [id=" + id + ", lowerBound=" + lowerBound + ", totalScore=" + totalScore + ", currentScore=" + this.getCurrentScore() + "]";
+		return "Record [id=" + id + ", lowerBound=" + lowerBound + ", totalScore=" + totalScore + "]";
 	}
 }
